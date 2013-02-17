@@ -3,6 +3,9 @@
 #define BLUE 6
 #define delayTime 20
 
+#define DEBUG
+#define VERBOSE
+
 void setup() {
 
   pinMode(RED, OUTPUT);
@@ -11,6 +14,9 @@ void setup() {
   digitalWrite(RED, HIGH);
   digitalWrite(GREEN, HIGH);
   digitalWrite(BLUE, HIGH);
+#ifdef DEBUG
+  Serial.begin(9600);
+#endif
 }
 
 int redVal;
@@ -54,7 +60,8 @@ void loop() {
     setColor(i, 0, i);
     delay(20);
   }*/
-  error();
+  pass();
+  fail();
   gradient(255,255,0, 128,0,255);
   off(200);
   gradient(128,0,255, 255,0,0);
@@ -86,9 +93,19 @@ void gradient(int startRed, int startGreen, int startBlue, int endRed, int endGr
 }
 
 void gradient(int startRed, int startGreen, int startBlue, int endRed, int endGreen, int endBlue, int duration, int steps) {
-  float stepRed = startRed - endRed / steps; // It's ok if these are negative, because they will still get 'added' to the start color.
-  float stepGreen = startGreen - endGreen / steps;
-  float stepBlue = startBlue - endBlue / steps;
+#ifdef DEBUG
+  Serial.print("In gradient(");
+  Serial.print(startRed);
+  Serial.print(",x,x, ");
+  Serial.print(endRed);
+  Serial.println(",x,x)");
+#endif  
+  float stepRed = (startRed - endRed) / steps; // It's ok if these are negative, because they will still get 'added' to the start color.
+  float stepGreen = (startGreen - endGreen) / steps;
+  float stepBlue = (startBlue - endBlue) / steps;
+  
+  Serial.print("stepRed = ");
+  Serial.println(stepRed);
   
   for (int i = 0; i < steps; i++) {
     setColor(startRed, startGreen, startBlue);
@@ -97,6 +114,9 @@ void gradient(int startRed, int startGreen, int startBlue, int endRed, int endGr
     startBlue += stepBlue;
     delay(duration / steps);
   }
+#ifdef DEBUG
+  assertEqual(endRed, startRed);
+#endif
 }
 
 void off(int duration) {
@@ -104,11 +124,30 @@ void off(int duration) {
   delay(duration);
 }
 
-void error() {
-  for (int i = 0; i < 10; i++) {
+void assertEqual(int expected, int actual) {
+  if (expected == actual) pass();
+  else {
+    fail();
+    Serial.print("Expected ");
+    Serial.print(expected);
+    Serial.print(". Actual ");
+    Serial.print(actual);
+    Serial.println(".");
+  }
+}
+
+void pass() {
+#ifdef VERBOSE
+  setColor(0x00FF00);
+  delay(100);
+#endif
+}
+
+void fail() {
+  for (int i = 0; i < 5; i++) {
     setColor(0xFF0000);
-    delay(100);
+    delay(150);
     setColor(0x000000);
-    delay(25);
+    delay(50);
   }
 }
