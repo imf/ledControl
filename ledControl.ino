@@ -60,13 +60,12 @@ void loop() {
     setColor(i, 0, i);
     delay(20);
   }*/
-  pass();
-  fail();
+//  pass();
+//  fail();
   gradient(255,255,0, 128,0,255);
-  off(200);
   gradient(128,0,255, 255,0,0);
-  off(200);
   gradient(255,0,0, 0,255,0);
+  gradient(0,255,0, 255,255,0, 1000, 32);
   delay(500);
   off(100);
 
@@ -100,14 +99,14 @@ void gradient(int startRed, int startGreen, int startBlue, int endRed, int endGr
   Serial.print(endRed);
   Serial.println(",x,x)");
 #endif  
-  float stepRed = (startRed - endRed) / steps; // It's ok if these are negative, because they will still get 'added' to the start color.
-  float stepGreen = (startGreen - endGreen) / steps;
-  float stepBlue = (startBlue - endBlue) / steps;
+  float stepRed = (endRed - startRed) / steps; // It's ok if these are negative, because they will still get 'added' to the start color.
+  float stepGreen = (endGreen - startGreen) / steps;
+  float stepBlue = (endBlue - startBlue) / steps;
   
   Serial.print("stepRed = ");
   Serial.println(stepRed);
   
-  for (int i = 0; i < steps; i++) {
+  for (int i = 0; i <= steps; i++) {
     setColor(startRed, startGreen, startBlue);
     startRed += stepRed;
     startGreen += stepGreen;
@@ -115,7 +114,7 @@ void gradient(int startRed, int startGreen, int startBlue, int endRed, int endGr
     delay(duration / steps);
   }
 #ifdef DEBUG
-  assertEqual(endRed, startRed);
+  assertEqual(endRed, startRed, stepRed);
 #endif
 }
 
@@ -125,13 +124,20 @@ void off(int duration) {
 }
 
 void assertEqual(int expected, int actual) {
-  if (expected == actual) pass();
+  assertEqual(expected, actual, 0);
+}
+
+void assertEqual(int expected, int actual, int tolerance) {
+  tolerance = abs(tolerance);
+  if (expected <= actual + tolerance && expected >= actual - tolerance) pass();
   else {
     fail();
-    Serial.print("Expected ");
+    Serial.print("Expected: ");
     Serial.print(expected);
-    Serial.print(". Actual ");
+    Serial.print(". Actual: ");
     Serial.print(actual);
+    Serial.print(". Tolerance: ");
+    Serial.print(tolerance);
     Serial.println(".");
   }
 }
