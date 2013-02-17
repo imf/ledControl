@@ -54,11 +54,14 @@ void loop() {
     setColor(i, 0, i);
     delay(20);
   }*/
+  error();
   gradient(255,255,0, 128,0,255);
-  off(100);
+  off(200);
   gradient(128,0,255, 255,0,0);
+  off(200);
   gradient(255,0,0, 0,255,0);
   delay(500);
+  off(100);
 
 }
 
@@ -99,4 +102,13 @@ void gradient(int startRed, int startGreen, int startBlue, int endRed, int endGr
 void off(int duration) {
   setColor(0x000000);
   delay(duration);
+}
+
+void error() {
+  for (int i = 0; i < 10; i++) {
+    setColor(0xFF0000);
+    delay(100);
+    setColor(0x000000);
+    delay(25);
+  }
 }
